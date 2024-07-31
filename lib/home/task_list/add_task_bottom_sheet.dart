@@ -9,6 +9,9 @@ class AddTaskBottomSheet extends StatefulWidget {
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   var selectDate = DateTime.now();
+  var formkey =GlobalKey<FormState>();
+  String title = '';
+  String description = '';
   @override
   Widget build(BuildContext context) {
     return  Container(
@@ -17,10 +20,23 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         children: [
           Text('Add new task',
           style: Theme.of(context).textTheme.titleMedium,),
-          Form(child: Column(
+          Form(
+              key: formkey,
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
+                onChanged: (text){
+                  title = text;
+                },
+                validator: (text){
+                  if(text == null || text.isEmpty){
+                    return 'please enter task title';
+                  }
+                  else{
+                    return null;
+                  }
+                },
                 decoration: InputDecoration(
                   hintText: 'enter your task title'
                 ),
@@ -29,6 +45,18 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 height: MediaQuery.of(context).size.height*0.02,
               ),
               TextFormField(
+                onChanged: (text){
+                  description = text;
+                },
+                validator: (text){
+                  if(text == null || text.isEmpty){
+                    return 'please enter task details';
+                  }
+                  else{
+                    return null;
+                  }
+                },
+
                 decoration: InputDecoration(
                   hintText: 'enter your task details'
                 ),
@@ -45,7 +73,8 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   onTap: (){
                     showCalender();
                   },
-                  child: Text('31/7/2024',
+                  child: Text('${selectDate.day}/${selectDate.month}/'
+                    '${selectDate.year}',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall,
                   ),
@@ -53,18 +82,17 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
               ),
               Padding(
                 padding: const EdgeInsets.all(30.0),
-                child: ElevatedButton.icon(onPressed: (){}, icon: Icon(Icons.check,), label: Text(''),
+                child: ElevatedButton.icon(onPressed: (){
+                  addTask();
+                }, icon: Icon(Icons.check,), label: Text(''),
                   style:
                   ElevatedButton.styleFrom(
                     shape: CircleBorder(),
                     padding: EdgeInsets.fromLTRB(18, 10, 10, 10),
                     backgroundColor: AppColors.primayColor
                   ),
-
-
                 ),
               )
-
             ],
           ))
         ],
@@ -80,5 +108,12 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         lastDate: DateTime.now().add(Duration(days: 365))
     );
     selectDate = chosenDate ?? selectDate;
+    setState(() {
+
+    });
+  }
+
+  void addTask() {
+    if(formkey.currentState?.validate() == true){}
   }
 }
