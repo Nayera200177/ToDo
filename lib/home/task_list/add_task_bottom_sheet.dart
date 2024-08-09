@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/app_colors.dart';
+import 'package:todo/firebase__utils.dart';
+import 'package:todo/model/task.dart';
+import 'package:todo/provider/list_provider.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
 
@@ -12,8 +17,11 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   var formkey =GlobalKey<FormState>();
   String title = '';
   String description = '';
+  late ListProvider listProvider;
+
   @override
   Widget build(BuildContext context) {
+    listProvider = Provider.of<ListProvider>(context);
     return  Container(
       margin: EdgeInsets.all(30),
       child: Column(
@@ -56,11 +64,10 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     return null;
                   }
                 },
-
                 decoration: InputDecoration(
                   hintText: 'enter your task details'
                 ),
-                maxLines: 4,
+                maxLines: 3,
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -114,6 +121,19 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   }
 
   void addTask() {
-    if(formkey.currentState?.validate() == true){}
+    if(formkey.currentState?.validate() == true){
+      Task task = Task(
+          title: title,
+          description: description,
+          dateTime: selectDate,
+           isDone: true
+      );
+      FirebaseUtils.addTaskToFirebase(task).timeout(Duration(seconds: 1),
+      onTimeout: (){
+        print('Task added successfully');
+        listProvider.getAllTasksFromFireStore();
+        Navigator.pop(context);
+      });
+    }
   }
 }
